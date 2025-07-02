@@ -5,6 +5,9 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { tasksDb } from "@/lib/db"
 import { createTask, toggleTaskComplete } from "./actions"
 
+// Force dynamic rendering - we need database access
+export const dynamic = 'force-dynamic'
+
 export default async function Home() {
   const tasks = await tasksDb.getAll()
 
