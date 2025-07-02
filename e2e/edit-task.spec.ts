@@ -81,8 +81,10 @@ test.describe('Edit Task', () => {
     await page.getByRole('button', { name: 'Cancel' }).click();
 
     // Verify the original task is still visible with original content
-    await expect(page.getByText(originalTitle)).toBeVisible();
-    await expect(page.getByText(originalDescription)).toBeVisible();
+    // Use the task element to check content within the specific task
+    const verifyTaskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: originalTitle });
+    await expect(verifyTaskElement).toBeVisible();
+    await expect(verifyTaskElement.getByText(originalDescription)).toBeVisible();
     await expect(page.getByText('Changed title that should not be saved')).not.toBeVisible();
   });
 
