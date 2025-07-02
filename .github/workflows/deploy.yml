@@ -1,0 +1,62 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22 with nvm
+        run: |
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          nvm install 22
+          nvm use 22
+          echo "$HOME/.nvm/versions/node/$(nvm current)/bin" >> $GITHUB_PATH
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+
+      - name: Cache yarn dependencies
+        uses: actions/cache@v4
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Run linting
+        run: yarn lint
+
+      - name: Run type checking
+        run: yarn typecheck
+
+      - name: Build application
+        run: yarn build
+        env:
+          SKIP_ENV_VALIDATION: true
+
+      - name: Deploy placeholder
+        run: |
+          echo "🚀 Deployment would happen here"
+          echo "Add your deployment steps (Vercel, Netlify, Docker, etc.)"
+          echo "Built files are ready in .next/ directory"
