@@ -110,6 +110,10 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
+      - name: Setup test database
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -d taskmanager_test -f init.sql
+
       - name: Run Playwright tests
         run: yarn test:e2e
         env:
