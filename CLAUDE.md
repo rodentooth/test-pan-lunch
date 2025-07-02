@@ -65,6 +65,33 @@ This project uses Node.js 22. Use nvm to manage the Node.js version:
 ## GitHub Issues Tracking
 The project uses GitHub issues to track features and technical tasks. Update issue status as development progresses.
 
+### Issue Management Guidelines
+When marking issues as complete, follow this consistent format:
+
+1. **Add completion comment** with clear status:
+   ```
+   ## ✅ COMPLETED
+   
+   **[Issue Title] - [Status]**
+   
+   [Description of what was completed with checkboxes:]
+   - ✅ Feature/requirement 1
+   - ✅ Feature/requirement 2
+   - ✅ Feature/requirement 3
+   
+   **Status: [COMPLETE/FOUNDATION COMPLETE/PARTIALLY COMPLETE]** - [Next steps if any]
+   ```
+
+2. **Close the issue** using `gh issue close [number]`
+
+3. **Update related issues** if completion affects other tasks
+
+4. **Consistent status markers:**
+   - ✅ COMPLETED - Fully implemented and tested
+   - 🚧 IN PROGRESS - Currently being worked on  
+   - ⏸️ BLOCKED - Waiting for dependencies
+   - 📋 PLANNED - Scheduled for future implementation
+
 ## Important Reminders
 - Always ask before committing changes
 - Use defensive security practices
