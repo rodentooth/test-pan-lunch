@@ -42,9 +42,16 @@ A modern task management application built with Next.js, featuring task creation
 - PostgreSQL with Docker for data persistence
 
 ## Environment Setup
-1. Copy `.env.example` to `.env.local` and update values if needed
-2. Start PostgreSQL database: `docker-compose up -d`
-3. Start development server: `yarn dev`
+1. Install Node.js 22 using nvm: `nvm use` (reads from .nvmrc)
+2. Copy `.env.example` to `.env.local` and update values if needed
+3. Start PostgreSQL database: `docker-compose up -d`
+4. Install dependencies: `yarn install`
+5. Start development server: `yarn dev`
+
+## Node.js Version
+This project uses Node.js 22. Use nvm to manage the Node.js version:
+- `nvm use` - Switch to the project's Node.js version (reads from .nvmrc)
+- `nvm install 22` - Install Node.js 22 if not already installed
 
 ## Development Guidelines
 - Always ask before committing changes
