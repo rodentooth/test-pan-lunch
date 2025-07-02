@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Task } from "@/lib/db"
 import { toggleTask } from "@/app/actions"
 import { EditTask } from "./EditTask"
+import { DeleteConfirmation } from "./DeleteConfirmation"
 import { Button } from "@/components/ui/button"
 
 interface TaskItemProps {
@@ -12,12 +13,20 @@ interface TaskItemProps {
 
 export function TaskItem({ task }: TaskItemProps) {
   const [isEditing, setIsEditing] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   if (isEditing) {
     return <EditTask task={task} onCancel={() => setIsEditing(false)} />
   }
 
   return (
+    <>
+      {showDeleteConfirm && (
+        <DeleteConfirmation 
+          task={task} 
+          onCancel={() => setShowDeleteConfirm(false)} 
+        />
+      )}
     <div 
       className="flex items-start space-x-3 p-3 border rounded-lg"
       data-testid={`task-${task.id}`}
@@ -76,7 +85,17 @@ export function TaskItem({ task }: TaskItemProps) {
         >
           Edit
         </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowDeleteConfirm(true)}
+          data-testid={`delete-task-${task.id}`}
+          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+        >
+          Delete
+        </Button>
       </div>
     </div>
+    </>
   )
 }
