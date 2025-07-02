@@ -40,6 +40,38 @@ export async function toggleTaskComplete(taskId: number, completed: boolean) {
   }
 }
 
+export async function editTask(formData: FormData) {
+  const taskId = parseInt(formData.get('taskId') as string)
+  const title = formData.get('title') as string
+  const description = formData.get('description') as string
+  const priority = formData.get('priority') as 'low' | 'medium' | 'high'
+  const category = formData.get('category') as string
+
+  if (!title || title.trim().length === 0) {
+    throw new Error('Task title is required')
+  }
+
+  try {
+    await tasksDb.update(taskId, {
+      title: title.trim(),
+      description: description?.trim() || undefined,
+      priority: priority || 'medium',
+      category: category?.trim() || undefined,
+    })
+    revalidatePath('/')
+  } catch (error) {
+    console.error('Failed to update task:', error)
+    throw new Error('Failed to update task')
+  }
+}
+
+export async function toggleTask(formData: FormData) {
+  const taskId = parseInt(formData.get('taskId') as string)
+  const currentCompleted = formData.get('completed') === 'true'
+  
+  await toggleTaskComplete(taskId, !currentCompleted)
+}
+
 export async function deleteTask(taskId: number) {
   try {
     await tasksDb.delete(taskId)
