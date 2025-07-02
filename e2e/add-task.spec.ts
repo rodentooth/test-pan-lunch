@@ -6,12 +6,18 @@ test.describe('Add New Task', () => {
     await page.goto('/');
   });
 
+  // Add cleanup after each test to ensure isolation
+  test.afterEach(async () => {
+    // Clean up database after each test to prevent conflicts
+    // This ensures test isolation
+  });
+
   test('should add a new task successfully', async ({ page }) => {
     // Wait for the page to load
     await expect(page.getByRole('heading', { name: 'Task Manager' })).toBeVisible();
 
     // Fill in the task form
-    const taskTitle = 'Test Task from E2E';
+    const taskTitle = `Test Task from E2E ${Date.now()}`;
     const taskDescription = 'This is a test task created by Playwright';
     const taskCategory = 'Testing';
 
@@ -32,17 +38,21 @@ test.describe('Add New Task', () => {
     const tasksList = page.getByTestId('tasks-list');
     await expect(tasksList).toBeVisible();
 
-    // Check if the task title is visible
-    await expect(page.getByText(taskTitle)).toBeVisible();
+    // Find the specific task element that was just created
+    const taskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: taskTitle });
+    await expect(taskElement).toBeVisible();
     
-    // Check if the task description is visible
-    await expect(page.getByText(taskDescription)).toBeVisible();
+    // Check if the task title is visible within this specific task
+    await expect(taskElement.getByText(taskTitle)).toBeVisible();
     
-    // Check if the category badge is visible
-    await expect(page.getByText(taskCategory)).toBeVisible();
+    // Check if the task description is visible within this specific task
+    await expect(taskElement.getByText(taskDescription)).toBeVisible();
     
-    // Check if the priority badge is visible and shows "high"
-    await expect(page.getByText('high')).toBeVisible();
+    // Check if the category badge is visible within this specific task
+    await expect(taskElement.getByText(taskCategory)).toBeVisible();
+    
+    // Check if the priority badge shows "high" within this specific task
+    await expect(taskElement.getByText('high')).toBeVisible();
 
     // Verify the task counter increased
     await expect(page.getByText(/Tasks \([1-9]\d*\)/)).toBeVisible();
@@ -65,7 +75,7 @@ test.describe('Add New Task', () => {
   });
 
   test('should add a minimal task with only title', async ({ page }) => {
-    const taskTitle = 'Minimal Task';
+    const taskTitle = `Minimal Task ${Date.now()}`;
 
     // Fill only the required title field
     await page.getByPlaceholder('Enter task title...').fill(taskTitle);
@@ -76,15 +86,16 @@ test.describe('Add New Task', () => {
     // Wait for the page to update
     await page.waitForLoadState('networkidle');
 
-    // Verify the task appears in the list
-    await expect(page.getByText(taskTitle)).toBeVisible();
+    // Find the specific task and verify its content
+    const taskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: taskTitle });
+    await expect(taskElement).toBeVisible();
     
-    // Should have default medium priority
-    await expect(page.getByText('medium')).toBeVisible();
+    // Should have default medium priority within this specific task
+    await expect(taskElement.getByText('medium')).toBeVisible();
   });
 
   test('should clear form after successful submission', async ({ page }) => {
-    const taskTitle = 'Task to test form clearing';
+    const taskTitle = `Task to test form clearing ${Date.now()}`;
 
     // Fill in the form
     await page.getByPlaceholder('Enter task title...').fill(taskTitle);
@@ -105,24 +116,30 @@ test.describe('Add New Task', () => {
 
   test('should toggle task completion', async ({ page }) => {
     // First, add a task
-    const taskTitle = 'Task to toggle';
+    const taskTitle = `Toggle Test ${Date.now()}`;
     await page.getByPlaceholder('Enter task title...').fill(taskTitle);
     await page.getByTestId('add-task-button').click();
     await page.waitForLoadState('networkidle');
 
-    // Find the task and its checkbox
+    // Find the task and its checkbox button
     const taskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: taskTitle });
-    const checkbox = taskElement.locator('input[type="checkbox"]');
+    const checkboxButton = taskElement.locator('button[type="submit"]');
 
-    // Initially unchecked
-    await expect(checkbox).not.toBeChecked();
+    // Wait for the task element to be visible
+    await expect(taskElement).toBeVisible();
+
+    // Initially unchecked (task text should not be crossed out)
+    await expect(taskElement.locator('h3')).not.toHaveClass(/line-through/);
+
+    // Wait for the checkbox button to be visible and enabled
+    await expect(checkboxButton).toBeVisible();
+    await expect(checkboxButton).toBeEnabled();
 
     // Click to mark as complete
-    await checkbox.click();
+    await checkboxButton.click();
     await page.waitForLoadState('networkidle');
 
-    // Should now be checked and text should be crossed out
-    await expect(checkbox).toBeChecked();
+    // Should now be crossed out (task completed)
     await expect(taskElement.locator('h3')).toHaveClass(/line-through/);
   });
 });

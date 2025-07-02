@@ -83,11 +83,18 @@ export default async function Home() {
                         'use server'
                         await toggleTaskComplete(task.id, !task.completed)
                       }}>
-                        <button type="submit" className="flex items-center">
-                          <Checkbox 
-                            defaultChecked={task.completed}
-                            disabled
-                          />
+                        <button type="submit" className="p-0 border-0 bg-transparent hover:opacity-75 cursor-pointer">
+                          <div className={`w-4 h-4 border-2 rounded flex items-center justify-center ${
+                            task.completed 
+                              ? 'bg-blue-600 border-blue-600 text-white' 
+                              : 'border-gray-300 bg-white'
+                          }`}>
+                            {task.completed && (
+                              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            )}
+                          </div>
                         </button>
                       </form>
                       <div className="flex-1 min-w-0">
