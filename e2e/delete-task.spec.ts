@@ -2,7 +2,22 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Delete Task', () => {
   test.beforeEach(async ({ page }) => {
+    // Clean up any existing tasks before each test
     await page.goto('/');
+    
+    // Delete all existing tasks to ensure clean state
+    const tasks = page.locator('[data-testid^="task-"]');
+    const taskCount = await tasks.count();
+    
+    for (let i = 0; i < taskCount; i++) {
+      const deleteButton = tasks.nth(0).locator('[data-testid^="delete-task-"]');
+      if (await deleteButton.isVisible()) {
+        await deleteButton.click();
+        // Wait for confirmation dialog and confirm deletion
+        await page.locator('button:has-text("Delete")').click();
+        await page.waitForLoadState('networkidle');
+      }
+    }
   });
 
   test('should show delete confirmation dialog', async ({ page }) => {
