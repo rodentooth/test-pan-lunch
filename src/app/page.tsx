@@ -1,10 +1,8 @@
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import { tasksDb } from "@/lib/db"
-import { createTask } from "./actions"
 import { TaskItem } from "@/components/TaskItem"
 import { FilterTabs } from "@/components/FilterTabs"
+import { AddTaskForm } from "@/components/AddTaskForm"
 
 // Force dynamic rendering - we need database access
 export const dynamic = 'force-dynamic'
@@ -39,46 +37,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
           Task Manager
         </h1>
         <div className="max-w-2xl mx-auto space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Add New Task</CardTitle>
-              <CardDescription>
-                Create a new task to add to your list.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form action={createTask} className="space-y-4">
-                <div className="flex space-x-2">
-                  <Input 
-                    name="title"
-                    placeholder="Enter task title..." 
-                    required
-                    className="flex-1"
-                  />
-                  <Button type="submit" data-testid="add-task-button">Add Task</Button>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <select 
-                    name="priority" 
-                    className="px-3 py-2 border rounded-md"
-                    defaultValue="medium"
-                  >
-                    <option value="low">Low Priority</option>
-                    <option value="medium">Medium Priority</option>
-                    <option value="high">High Priority</option>
-                  </select>
-                  <Input 
-                    name="category"
-                    placeholder="Category (optional)"
-                  />
-                </div>
-                <Input 
-                  name="description"
-                  placeholder="Description (optional)"
-                />
-              </form>
-            </CardContent>
-          </Card>
+          <AddTaskForm taskCount={allCount} />
 
           <Card>
             <CardHeader>
