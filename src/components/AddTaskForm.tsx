@@ -18,7 +18,11 @@ export function AddTaskForm({ taskCount }: AddTaskFormProps) {
   const formRef = useRef<HTMLFormElement>(null)
   const pendingFormDataRef = useRef<FormData | null>(null)
 
-  const handleSubmit = async (formData: FormData) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    
+    const formData = new FormData(e.currentTarget)
+    
     // Show procrastination message with some randomness (70% chance after 3+ tasks)
     const shouldShowMessage = taskCount >= 3 && Math.random() < 0.7
     
@@ -102,7 +106,7 @@ export function AddTaskForm({ taskCount }: AddTaskFormProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form ref={formRef} action={handleSubmit} className="space-y-4">
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
             <div className="flex space-x-2">
               <Input 
                 name="title"
