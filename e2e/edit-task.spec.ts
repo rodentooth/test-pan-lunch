@@ -2,7 +2,22 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Edit Task', () => {
   test.beforeEach(async ({ page }) => {
+    // Clean up any existing tasks before each test
     await page.goto('/');
+    
+    // Delete all existing tasks to ensure clean state
+    const tasks = page.locator('[data-testid^="task-"]');
+    const taskCount = await tasks.count();
+    
+    for (let i = 0; i < taskCount; i++) {
+      const deleteButton = tasks.nth(0).locator('[data-testid^="delete-task-"]');
+      if (await deleteButton.isVisible()) {
+        await deleteButton.click();
+        // Wait for confirmation dialog and confirm deletion using specific confirmation dialog selector
+        await page.locator('div:has-text("Are you sure you want to delete") form button:has-text("Delete")').click();
+        await page.waitForLoadState('networkidle');
+      }
+    }
   });
 
   test('should edit a task successfully', async ({ page }) => {
@@ -15,7 +30,7 @@ test.describe('Edit Task', () => {
     await page.getByPlaceholder('Description (optional)').fill(originalDescription);
     await page.getByPlaceholder('Category (optional)').fill(originalCategory);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Find the task that was just created
     const taskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: originalTitle });
@@ -42,7 +57,7 @@ test.describe('Edit Task', () => {
 
     // Save the changes
     await page.getByRole('button', { name: 'Save Changes' }).click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).filter({ hasText: newTitle })).toBeVisible();
 
     // Verify the task was updated
     const updatedTaskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: newTitle });
@@ -63,7 +78,7 @@ test.describe('Edit Task', () => {
     await page.getByPlaceholder('Enter task title...').fill(originalTitle);
     await page.getByPlaceholder('Description (optional)').fill(originalDescription);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Find the task and click edit
     const taskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: originalTitle });
@@ -94,7 +109,7 @@ test.describe('Edit Task', () => {
 
     await page.getByPlaceholder('Enter task title...').fill(originalTitle);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Find the task and click edit
     const taskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: originalTitle });

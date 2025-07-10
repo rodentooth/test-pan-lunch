@@ -114,6 +114,10 @@ jobs:
         run: |
           PGPASSWORD=postgres psql -h localhost -U postgres -d taskmanager_test -f init.sql
 
+      - name: Clean test database before tests
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -d taskmanager_test -c "TRUNCATE TABLE tasks RESTART IDENTITY CASCADE;"
+
       - name: Run Playwright tests
         run: yarn test:e2e
         env:

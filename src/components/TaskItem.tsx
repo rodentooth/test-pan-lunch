@@ -34,7 +34,11 @@ export function TaskItem({ task }: TaskItemProps) {
       <form action={toggleTask}>
         <input type="hidden" name="taskId" value={task.id} />
         <input type="hidden" name="completed" value={task.completed.toString()} />
-        <button type="submit" className="p-0 border-0 bg-transparent hover:opacity-75 cursor-pointer">
+        <button 
+          type="submit" 
+          className="p-1 border-0 bg-transparent hover:opacity-75 cursor-pointer rounded flex items-center justify-center"
+          data-testid={`toggle-task-${task.id}`}
+        >
           <div className={`w-4 h-4 border-2 rounded flex items-center justify-center ${
             task.completed 
               ? 'bg-blue-600 border-blue-600 text-white' 

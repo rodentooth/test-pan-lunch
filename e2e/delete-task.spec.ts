@@ -2,7 +2,22 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Delete Task', () => {
   test.beforeEach(async ({ page }) => {
+    // Clean up any existing tasks before each test
     await page.goto('/');
+    
+    // Delete all existing tasks to ensure clean state
+    const tasks = page.locator('[data-testid^="task-"]');
+    const taskCount = await tasks.count();
+    
+    for (let i = 0; i < taskCount; i++) {
+      const deleteButton = tasks.nth(0).locator('[data-testid^="delete-task-"]');
+      if (await deleteButton.isVisible()) {
+        await deleteButton.click();
+        // Wait for confirmation dialog and confirm deletion using specific confirmation dialog selector
+        await page.locator('div:has-text("Are you sure you want to delete") form button:has-text("Delete")').click();
+        await page.waitForLoadState('networkidle');
+      }
+    }
   });
 
   test('should show delete confirmation dialog', async ({ page }) => {
@@ -13,7 +28,7 @@ test.describe('Delete Task', () => {
     await page.getByPlaceholder('Enter task title...').fill(taskTitle);
     await page.getByPlaceholder('Description (optional)').fill(taskDescription);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Find the task and click delete
     const taskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: taskTitle });
@@ -37,7 +52,7 @@ test.describe('Delete Task', () => {
     
     await page.getByPlaceholder('Enter task title...').fill(taskTitle);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Find the task and click delete
     const taskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: taskTitle });
@@ -65,7 +80,7 @@ test.describe('Delete Task', () => {
     await page.getByPlaceholder('Enter task title...').fill(taskTitle);
     await page.getByPlaceholder('Description (optional)').fill(taskDescription);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Verify task exists
     const taskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: taskTitle });
@@ -95,7 +110,7 @@ test.describe('Delete Task', () => {
     
     await page.getByPlaceholder('Enter task title...').fill(longTitle);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Find and delete the task
     const taskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: longTitle });

@@ -2,7 +2,22 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Filter Tasks', () => {
   test.beforeEach(async ({ page }) => {
+    // Clean up any existing tasks before each test
     await page.goto('/');
+    
+    // Delete all existing tasks to ensure clean state
+    const tasks = page.locator('[data-testid^="task-"]');
+    const taskCount = await tasks.count();
+    
+    for (let i = 0; i < taskCount; i++) {
+      const deleteButton = tasks.nth(0).locator('[data-testid^="delete-task-"]');
+      if (await deleteButton.isVisible()) {
+        await deleteButton.click();
+        // Wait for confirmation dialog and confirm deletion using specific confirmation dialog selector
+        await page.locator('div:has-text("Are you sure you want to delete") form button:has-text("Delete")').click();
+        await page.waitForLoadState('networkidle');
+      }
+    }
   });
 
   test('should display filter tabs with correct counts', async ({ page }) => {
@@ -13,17 +28,18 @@ test.describe('Filter Tasks', () => {
     // Add first task (will be active)
     await page.getByPlaceholder('Enter task title...').fill(activeTask);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Add second task and mark it as completed
     await page.getByPlaceholder('Enter task title...').fill(completedTask);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Mark the second task as completed
     const completedTaskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: completedTask });
-    await completedTaskElement.locator('button[type="submit"]').click();
-    await page.waitForLoadState('networkidle');
+    const taskId = await completedTaskElement.getAttribute('data-testid');
+    const taskNumber = taskId?.replace('task-', '') || '';
+    await page.getByTestId(`toggle-task-${taskNumber}`).click();
 
     // Check filter tabs are visible
     await expect(page.getByTestId('filter-tabs')).toBeVisible();
@@ -45,21 +61,24 @@ test.describe('Filter Tasks', () => {
     // Add active task
     await page.getByPlaceholder('Enter task title...').fill(activeTask);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Add completed task
     await page.getByPlaceholder('Enter task title...').fill(completedTask);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Mark second task as completed
     const completedTaskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: completedTask });
-    await completedTaskElement.locator('button[type="submit"]').click();
-    await page.waitForLoadState('networkidle');
+    const taskId1 = await completedTaskElement.getAttribute('data-testid');
+    const taskNumber1 = taskId1?.replace('task-', '') || '';
+    await page.getByTestId(`toggle-task-${taskNumber1}`).click();
 
     // Click Active filter
     await page.getByTestId('filter-active').click();
-    await page.waitForLoadState('networkidle');
+
+    // Wait for URL to update with filter parameter
+    await page.waitForURL('**/?filter=active');
 
     // Verify URL contains filter parameter
     expect(page.url()).toContain('filter=active');
@@ -80,21 +99,24 @@ test.describe('Filter Tasks', () => {
     // Add active task
     await page.getByPlaceholder('Enter task title...').fill(activeTask);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Add completed task
     await page.getByPlaceholder('Enter task title...').fill(completedTask);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Mark second task as completed
     const completedTaskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: completedTask });
-    await completedTaskElement.locator('button[type="submit"]').click();
-    await page.waitForLoadState('networkidle');
+    const taskId2 = await completedTaskElement.getAttribute('data-testid');
+    const taskNumber2 = taskId2?.replace('task-', '') || '';
+    await page.getByTestId(`toggle-task-${taskNumber2}`).click();
 
     // Click Completed filter
     await page.getByTestId('filter-completed').click();
-    await page.waitForLoadState('networkidle');
+
+    // Wait for URL to update with filter parameter
+    await page.waitForURL('**/?filter=completed');
 
     // Verify URL contains filter parameter
     expect(page.url()).toContain('filter=completed');
@@ -115,24 +137,26 @@ test.describe('Filter Tasks', () => {
     // Add tasks
     await page.getByPlaceholder('Enter task title...').fill(activeTask);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     await page.getByPlaceholder('Enter task title...').fill(completedTask);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Mark second task as completed
     const completedTaskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: completedTask });
-    await completedTaskElement.locator('button[type="submit"]').click();
-    await page.waitForLoadState('networkidle');
+    const taskId3 = await completedTaskElement.getAttribute('data-testid');
+    const taskNumber3 = taskId3?.replace('task-', '') || '';
+    await page.getByTestId(`toggle-task-${taskNumber3}`).click();
 
     // First filter to active
     await page.getByTestId('filter-active').click();
-    await page.waitForLoadState('networkidle');
 
     // Then click All filter
     await page.getByTestId('filter-all').click();
-    await page.waitForLoadState('networkidle');
+
+    // Wait for URL to be cleared of filter parameters
+    await page.waitForURL('http://localhost:3000/');
 
     // Verify URL doesn't contain filter parameter (default)
     expect(page.url()).not.toContain('filter=');
@@ -151,16 +175,16 @@ test.describe('Filter Tasks', () => {
     
     await page.getByPlaceholder('Enter task title...').fill(completedTask);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Mark task as completed
     const taskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: completedTask });
-    await taskElement.locator('button[type="submit"]').click();
-    await page.waitForLoadState('networkidle');
+    const taskId4 = await taskElement.getAttribute('data-testid');
+    const taskNumber4 = taskId4?.replace('task-', '') || '';
+    await page.getByTestId(`toggle-task-${taskNumber4}`).click();
 
     // Filter to completed tasks
     await page.getByTestId('filter-completed').click();
-    await page.waitForLoadState('networkidle');
 
     // Navigate away and back
     await page.goto('/');
@@ -181,17 +205,15 @@ test.describe('Filter Tasks', () => {
     const activeTask = `Empty State Test ${Date.now()}`;
     await page.getByPlaceholder('Enter task title...').fill(activeTask);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Filter to completed (should show empty state)
     await page.getByTestId('filter-completed').click();
-    await page.waitForLoadState('networkidle');
 
     await expect(page.getByTestId('empty-tasks-message')).toContainText('No completed tasks found');
 
     // Filter to active (should show the task)
     await page.getByTestId('filter-active').click();
-    await page.waitForLoadState('networkidle');
 
     await expect(page.getByText(activeTask)).toBeVisible();
     await expect(page.getByTestId('empty-tasks-message')).not.toBeVisible();
@@ -203,7 +225,7 @@ test.describe('Filter Tasks', () => {
     
     await page.getByPlaceholder('Enter task title...').fill(taskTitle);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Initially: 1 all, 1 active, 0 completed
     await expect(page.getByTestId('filter-all').locator('span')).toContainText('1');
@@ -212,8 +234,9 @@ test.describe('Filter Tasks', () => {
 
     // Mark task as completed
     const taskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: taskTitle });
-    await taskElement.locator('button[type="submit"]').click();
-    await page.waitForLoadState('networkidle');
+    const taskId5 = await taskElement.getAttribute('data-testid');
+    const taskNumber5 = taskId5?.replace('task-', '') || '';
+    await page.getByTestId(`toggle-task-${taskNumber5}`).click();
 
     // Now: 1 all, 0 active, 1 completed
     await expect(page.getByTestId('filter-all').locator('span')).toContainText('1');
@@ -221,8 +244,7 @@ test.describe('Filter Tasks', () => {
     await expect(page.getByTestId('filter-completed').locator('span')).toContainText('1');
 
     // Mark task as active again
-    await taskElement.locator('button[type="submit"]').click();
-    await page.waitForLoadState('networkidle');
+    await page.getByTestId(`toggle-task-${taskNumber5}`).click();
 
     // Back to: 1 all, 1 active, 0 completed
     await expect(page.getByTestId('filter-all').locator('span')).toContainText('1');
