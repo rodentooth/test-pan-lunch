@@ -4,12 +4,33 @@ import { Input } from "@/components/ui/input"
 import { tasksDb } from "@/lib/db"
 import { createTask } from "./actions"
 import { TaskItem } from "@/components/TaskItem"
+import { FilterTabs } from "@/components/FilterTabs"
 
 // Force dynamic rendering - we need database access
 export const dynamic = 'force-dynamic'
 
-export default async function Home() {
-  const tasks = await tasksDb.getAll()
+type FilterStatus = 'all' | 'active' | 'completed'
+
+interface SearchParams {
+  filter?: FilterStatus
+}
+
+export default async function Home({ searchParams }: { searchParams: Promise<SearchParams> }) {
+  const allTasks = await tasksDb.getAll()
+  const resolvedSearchParams = await searchParams
+  const filter = resolvedSearchParams.filter || 'all'
+  
+  // Filter tasks based on current filter
+  const filteredTasks = filter === 'all' 
+    ? allTasks
+    : filter === 'active'
+      ? allTasks.filter(task => !task.completed)
+      : allTasks.filter(task => task.completed)
+
+  // Calculate counts for filter tabs
+  const allCount = allTasks.length
+  const activeCount = allTasks.filter(task => !task.completed).length
+  const completedCount = allTasks.filter(task => task.completed).length
 
   return (
     <main className="min-h-screen bg-background">
@@ -61,19 +82,27 @@ export default async function Home() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Tasks ({tasks.length})</CardTitle>
+              <CardTitle>Tasks ({filteredTasks.length})</CardTitle>
               <CardDescription>
                 Manage your tasks below.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {tasks.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">
-                  No tasks yet. Add one above to get started!
+              <FilterTabs 
+                allCount={allCount}
+                activeCount={activeCount}
+                completedCount={completedCount}
+              />
+              {filteredTasks.length === 0 ? (
+                <p className="text-muted-foreground text-center py-8" data-testid="empty-tasks-message">
+                  {allCount === 0 
+                    ? "No tasks yet. Add one above to get started!" 
+                    : `No ${filter} tasks found.`
+                  }
                 </p>
               ) : (
                 <div className="space-y-3" data-testid="tasks-list">
-                  {tasks.map((task) => (
+                  {filteredTasks.map((task) => (
                     <TaskItem key={task.id} task={task} />
                   ))}
                 </div>
