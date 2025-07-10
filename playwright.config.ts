@@ -5,14 +5,14 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './e2e',
-  /* Run tests sequentially to avoid conflicts */
-  fullyParallel: false,
+  /* Enable parallel execution for better performance */
+  fullyParallel: process.env.CI ? false : true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Run tests sequentially with single worker */
-  workers: 1,
+  /* Optimize workers for CI vs local development */
+  workers: process.env.CI ? 1 : '50%',
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -25,7 +25,12 @@ export default defineConfig({
   },
 
   /* Configure projects for major browsers */
-  projects: [
+  projects: process.env.CI ? [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+  ] : [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
@@ -68,5 +73,11 @@ export default defineConfig({
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
+  },
+
+  /* Global test timeout and expect timeout for better performance */
+  timeout: 30 * 1000, // 30 seconds per test
+  expect: {
+    timeout: 10 * 1000, // 10 seconds for assertions
   },
 });

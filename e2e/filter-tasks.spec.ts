@@ -28,19 +28,18 @@ test.describe('Filter Tasks', () => {
     // Add first task (will be active)
     await page.getByPlaceholder('Enter task title...').fill(activeTask);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Add second task and mark it as completed
     await page.getByPlaceholder('Enter task title...').fill(completedTask);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Mark the second task as completed
     const completedTaskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: completedTask });
     const taskId = await completedTaskElement.getAttribute('data-testid');
     const taskNumber = taskId?.replace('task-', '') || '';
     await page.getByTestId(`toggle-task-${taskNumber}`).click();
-    await page.waitForLoadState('networkidle');
 
     // Check filter tabs are visible
     await expect(page.getByTestId('filter-tabs')).toBeVisible();
@@ -62,23 +61,21 @@ test.describe('Filter Tasks', () => {
     // Add active task
     await page.getByPlaceholder('Enter task title...').fill(activeTask);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Add completed task
     await page.getByPlaceholder('Enter task title...').fill(completedTask);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Mark second task as completed
     const completedTaskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: completedTask });
     const taskId1 = await completedTaskElement.getAttribute('data-testid');
     const taskNumber1 = taskId1?.replace('task-', '') || '';
     await page.getByTestId(`toggle-task-${taskNumber1}`).click();
-    await page.waitForLoadState('networkidle');
 
     // Click Active filter
     await page.getByTestId('filter-active').click();
-    await page.waitForLoadState('networkidle');
 
     // Verify URL contains filter parameter
     expect(page.url()).toContain('filter=active');
@@ -99,23 +96,21 @@ test.describe('Filter Tasks', () => {
     // Add active task
     await page.getByPlaceholder('Enter task title...').fill(activeTask);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Add completed task
     await page.getByPlaceholder('Enter task title...').fill(completedTask);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Mark second task as completed
     const completedTaskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: completedTask });
     const taskId2 = await completedTaskElement.getAttribute('data-testid');
     const taskNumber2 = taskId2?.replace('task-', '') || '';
     await page.getByTestId(`toggle-task-${taskNumber2}`).click();
-    await page.waitForLoadState('networkidle');
 
     // Click Completed filter
     await page.getByTestId('filter-completed').click();
-    await page.waitForLoadState('networkidle');
 
     // Verify URL contains filter parameter
     expect(page.url()).toContain('filter=completed');
@@ -136,26 +131,23 @@ test.describe('Filter Tasks', () => {
     // Add tasks
     await page.getByPlaceholder('Enter task title...').fill(activeTask);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     await page.getByPlaceholder('Enter task title...').fill(completedTask);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Mark second task as completed
     const completedTaskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: completedTask });
     const taskId3 = await completedTaskElement.getAttribute('data-testid');
     const taskNumber3 = taskId3?.replace('task-', '') || '';
     await page.getByTestId(`toggle-task-${taskNumber3}`).click();
-    await page.waitForLoadState('networkidle');
 
     // First filter to active
     await page.getByTestId('filter-active').click();
-    await page.waitForLoadState('networkidle');
 
     // Then click All filter
     await page.getByTestId('filter-all').click();
-    await page.waitForLoadState('networkidle');
 
     // Verify URL doesn't contain filter parameter (default)
     expect(page.url()).not.toContain('filter=');
@@ -174,18 +166,16 @@ test.describe('Filter Tasks', () => {
     
     await page.getByPlaceholder('Enter task title...').fill(completedTask);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Mark task as completed
     const taskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: completedTask });
     const taskId4 = await taskElement.getAttribute('data-testid');
     const taskNumber4 = taskId4?.replace('task-', '') || '';
     await page.getByTestId(`toggle-task-${taskNumber4}`).click();
-    await page.waitForLoadState('networkidle');
 
     // Filter to completed tasks
     await page.getByTestId('filter-completed').click();
-    await page.waitForLoadState('networkidle');
 
     // Navigate away and back
     await page.goto('/');
@@ -206,17 +196,15 @@ test.describe('Filter Tasks', () => {
     const activeTask = `Empty State Test ${Date.now()}`;
     await page.getByPlaceholder('Enter task title...').fill(activeTask);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Filter to completed (should show empty state)
     await page.getByTestId('filter-completed').click();
-    await page.waitForLoadState('networkidle');
 
     await expect(page.getByTestId('empty-tasks-message')).toContainText('No completed tasks found');
 
     // Filter to active (should show the task)
     await page.getByTestId('filter-active').click();
-    await page.waitForLoadState('networkidle');
 
     await expect(page.getByText(activeTask)).toBeVisible();
     await expect(page.getByTestId('empty-tasks-message')).not.toBeVisible();
@@ -228,7 +216,7 @@ test.describe('Filter Tasks', () => {
     
     await page.getByPlaceholder('Enter task title...').fill(taskTitle);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Initially: 1 all, 1 active, 0 completed
     await expect(page.getByTestId('filter-all').locator('span')).toContainText('1');
@@ -240,7 +228,6 @@ test.describe('Filter Tasks', () => {
     const taskId5 = await taskElement.getAttribute('data-testid');
     const taskNumber5 = taskId5?.replace('task-', '') || '';
     await page.getByTestId(`toggle-task-${taskNumber5}`).click();
-    await page.waitForLoadState('networkidle');
 
     // Now: 1 all, 0 active, 1 completed
     await expect(page.getByTestId('filter-all').locator('span')).toContainText('1');
@@ -249,7 +236,6 @@ test.describe('Filter Tasks', () => {
 
     // Mark task as active again
     await page.getByTestId(`toggle-task-${taskNumber5}`).click();
-    await page.waitForLoadState('networkidle');
 
     // Back to: 1 all, 1 active, 0 completed
     await expect(page.getByTestId('filter-all').locator('span')).toContainText('1');

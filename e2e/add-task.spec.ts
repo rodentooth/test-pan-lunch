@@ -133,7 +133,7 @@ test.describe('Add New Task', () => {
     const taskTitle = `Toggle Test ${Date.now()}`;
     await page.getByPlaceholder('Enter task title...').fill(taskTitle);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Find the task and its checkbox button
     const taskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: taskTitle });
@@ -153,7 +153,6 @@ test.describe('Add New Task', () => {
 
     // Click to mark as complete
     await checkboxButton.click();
-    await page.waitForLoadState('networkidle');
 
     // Should now be crossed out (task completed)
     await expect(taskElement.locator('h3')).toHaveClass(/line-through/);

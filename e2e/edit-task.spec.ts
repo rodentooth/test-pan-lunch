@@ -30,7 +30,7 @@ test.describe('Edit Task', () => {
     await page.getByPlaceholder('Description (optional)').fill(originalDescription);
     await page.getByPlaceholder('Category (optional)').fill(originalCategory);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Find the task that was just created
     const taskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: originalTitle });
@@ -57,7 +57,7 @@ test.describe('Edit Task', () => {
 
     // Save the changes
     await page.getByRole('button', { name: 'Save Changes' }).click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).filter({ hasText: newTitle })).toBeVisible();
 
     // Verify the task was updated
     const updatedTaskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: newTitle });
@@ -78,7 +78,7 @@ test.describe('Edit Task', () => {
     await page.getByPlaceholder('Enter task title...').fill(originalTitle);
     await page.getByPlaceholder('Description (optional)').fill(originalDescription);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Find the task and click edit
     const taskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: originalTitle });
@@ -109,7 +109,7 @@ test.describe('Edit Task', () => {
 
     await page.getByPlaceholder('Enter task title...').fill(originalTitle);
     await page.getByTestId('add-task-button').click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator(`[data-testid^="task-"]`).last()).toBeVisible();
 
     // Find the task and click edit
     const taskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: originalTitle });
