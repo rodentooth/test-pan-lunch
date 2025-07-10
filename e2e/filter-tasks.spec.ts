@@ -77,6 +77,9 @@ test.describe('Filter Tasks', () => {
     // Click Active filter
     await page.getByTestId('filter-active').click();
 
+    // Wait for URL to update with filter parameter
+    await page.waitForURL('**/?filter=active');
+
     // Verify URL contains filter parameter
     expect(page.url()).toContain('filter=active');
 
@@ -111,6 +114,9 @@ test.describe('Filter Tasks', () => {
 
     // Click Completed filter
     await page.getByTestId('filter-completed').click();
+
+    // Wait for URL to update with filter parameter
+    await page.waitForURL('**/?filter=completed');
 
     // Verify URL contains filter parameter
     expect(page.url()).toContain('filter=completed');
@@ -148,6 +154,9 @@ test.describe('Filter Tasks', () => {
 
     // Then click All filter
     await page.getByTestId('filter-all').click();
+
+    // Wait for URL to be cleared of filter parameters
+    await page.waitForURL('http://localhost:3000/');
 
     // Verify URL doesn't contain filter parameter (default)
     expect(page.url()).not.toContain('filter=');
