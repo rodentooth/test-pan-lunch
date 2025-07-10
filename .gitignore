@@ -12,6 +12,7 @@ node_modules/
 .next/
 out/
 dist/
+build/
 
 # Environment variables
 .env
@@ -59,6 +60,7 @@ coverage/
 # IDE files
 .vscode/
 .idea/
+.claude/
 
 # OS generated files
 .DS_Store
@@ -78,6 +80,9 @@ Thumbs.db
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+test-results/
+playwright-report/
+blob-report/
 
 # Swap the comments on the following lines if you wish to use zero-installs
 # In that case, don't forget to run `yarn config set enableGlobalCache false`!
