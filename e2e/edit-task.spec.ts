@@ -13,8 +13,8 @@ test.describe('Edit Task', () => {
       const deleteButton = tasks.nth(0).locator('[data-testid^="delete-task-"]');
       if (await deleteButton.isVisible()) {
         await deleteButton.click();
-        // Wait for confirmation dialog and confirm deletion
-        await page.locator('button:has-text("Delete")').click();
+        // Wait for confirmation dialog and confirm deletion using specific confirmation dialog selector
+        await page.locator('div:has-text("Are you sure you want to delete") form button:has-text("Delete")').click();
         await page.waitForLoadState('networkidle');
       }
     }
