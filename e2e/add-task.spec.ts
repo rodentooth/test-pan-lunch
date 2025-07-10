@@ -137,7 +137,9 @@ test.describe('Add New Task', () => {
 
     // Find the task and its checkbox button
     const taskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: taskTitle });
-    const checkboxButton = taskElement.locator('button[type="submit"]');
+    const taskId = await taskElement.getAttribute('data-testid');
+    const taskNumber = taskId?.replace('task-', '') || '';
+    const checkboxButton = page.getByTestId(`toggle-task-${taskNumber}`);
 
     // Wait for the task element to be visible
     await expect(taskElement).toBeVisible();

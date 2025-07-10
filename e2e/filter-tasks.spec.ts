@@ -37,7 +37,9 @@ test.describe('Filter Tasks', () => {
 
     // Mark the second task as completed
     const completedTaskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: completedTask });
-    await completedTaskElement.locator('button[type="submit"]').click();
+    const taskId = await completedTaskElement.getAttribute('data-testid');
+    const taskNumber = taskId?.replace('task-', '') || '';
+    await page.getByTestId(`toggle-task-${taskNumber}`).click();
     await page.waitForLoadState('networkidle');
 
     // Check filter tabs are visible
@@ -69,7 +71,9 @@ test.describe('Filter Tasks', () => {
 
     // Mark second task as completed
     const completedTaskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: completedTask });
-    await completedTaskElement.locator('button[type="submit"]').click();
+    const taskId1 = await completedTaskElement.getAttribute('data-testid');
+    const taskNumber1 = taskId1?.replace('task-', '') || '';
+    await page.getByTestId(`toggle-task-${taskNumber1}`).click();
     await page.waitForLoadState('networkidle');
 
     // Click Active filter
@@ -104,7 +108,9 @@ test.describe('Filter Tasks', () => {
 
     // Mark second task as completed
     const completedTaskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: completedTask });
-    await completedTaskElement.locator('button[type="submit"]').click();
+    const taskId2 = await completedTaskElement.getAttribute('data-testid');
+    const taskNumber2 = taskId2?.replace('task-', '') || '';
+    await page.getByTestId(`toggle-task-${taskNumber2}`).click();
     await page.waitForLoadState('networkidle');
 
     // Click Completed filter
@@ -138,7 +144,9 @@ test.describe('Filter Tasks', () => {
 
     // Mark second task as completed
     const completedTaskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: completedTask });
-    await completedTaskElement.locator('button[type="submit"]').click();
+    const taskId3 = await completedTaskElement.getAttribute('data-testid');
+    const taskNumber3 = taskId3?.replace('task-', '') || '';
+    await page.getByTestId(`toggle-task-${taskNumber3}`).click();
     await page.waitForLoadState('networkidle');
 
     // First filter to active
@@ -170,7 +178,9 @@ test.describe('Filter Tasks', () => {
 
     // Mark task as completed
     const taskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: completedTask });
-    await taskElement.locator('button[type="submit"]').click();
+    const taskId4 = await taskElement.getAttribute('data-testid');
+    const taskNumber4 = taskId4?.replace('task-', '') || '';
+    await page.getByTestId(`toggle-task-${taskNumber4}`).click();
     await page.waitForLoadState('networkidle');
 
     // Filter to completed tasks
@@ -227,7 +237,9 @@ test.describe('Filter Tasks', () => {
 
     // Mark task as completed
     const taskElement = page.locator(`[data-testid^="task-"]`).filter({ hasText: taskTitle });
-    await taskElement.locator('button[type="submit"]').click();
+    const taskId5 = await taskElement.getAttribute('data-testid');
+    const taskNumber5 = taskId5?.replace('task-', '') || '';
+    await page.getByTestId(`toggle-task-${taskNumber5}`).click();
     await page.waitForLoadState('networkidle');
 
     // Now: 1 all, 0 active, 1 completed
@@ -236,7 +248,7 @@ test.describe('Filter Tasks', () => {
     await expect(page.getByTestId('filter-completed').locator('span')).toContainText('1');
 
     // Mark task as active again
-    await taskElement.locator('button[type="submit"]').click();
+    await page.getByTestId(`toggle-task-${taskNumber5}`).click();
     await page.waitForLoadState('networkidle');
 
     // Back to: 1 all, 1 active, 0 completed
