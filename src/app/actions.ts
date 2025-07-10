@@ -72,6 +72,12 @@ export async function toggleTask(formData: FormData) {
   await toggleTaskComplete(taskId, !currentCompleted)
 }
 
+export async function deleteTaskAction(formData: FormData) {
+  const taskId = parseInt(formData.get('taskId') as string)
+  
+  await deleteTask(taskId)
+}
+
 export async function deleteTask(taskId: number) {
   try {
     await tasksDb.delete(taskId)
